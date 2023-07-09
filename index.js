@@ -21,7 +21,25 @@ const choiceList = [
 ]
 // Function for viewing all employees
 const viewAllEmployees = () => {
-  console.log('Viewing all employees')
+  let sql = `SELECT employee.id, 
+    employee.first_name, 
+    employee.last_name, 
+    role.title, 
+    department.department_name, 
+    role.salary
+    FROM employee, role, department 
+    WHERE department.id = role.department_id 
+    AND role.id = employee.role_id
+    ORDER BY employee.id ASC`
+  db.query(sql, (err, response) => {
+    if (err) {
+      throw new Error(err)
+    } else {
+      console.log('Viewing all employees:')
+      console.table(response)
+    }
+    showPrompt()
+  })
 }
 // Function for adding an employee
 const addEmployee = () => {
@@ -53,7 +71,7 @@ const closeApp = () => {
 }
 
 // Create a function to initialize app
-const init = () => {
+const showPrompt = () => {
   // Method to connect to our db
   db.connect((err) => {
     if (err) {
@@ -97,4 +115,4 @@ const init = () => {
   })
 }
 // Function call to initialize app
-init()
+showPrompt()
