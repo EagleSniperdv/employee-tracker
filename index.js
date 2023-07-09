@@ -1,17 +1,7 @@
 // Required packages
 const inquirer = require('inquirer')
-const mysql = require('mysql2')
-require('dotenv').config()
 
-// Database connection
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: process.env.DB_PASSWORD,
-  database: 'test',
-})
-
-const questions = [
+const choiceList = [
   {
     type: 'list',
     name: 'choiceList',
@@ -62,40 +52,41 @@ const closeApp = () => {
 }
 
 // Create a function to initialize app
-const init = async () => {
-  const { choices } = await inquirer.prompt(questions)
-  console.log(choices)
-  if (choices === 'View All Employees') {
-    viewAllEmployees()
-  }
+const init = () => {
+  inquirer.prompt(choiceList).then((answer) => {
+    const choice = answer.choiceList
+    if (choice === 'View All Employees') {
+      viewAllEmployees()
+    }
 
-  if (choices === 'Add Employee') {
-    addEmployee()
-  }
+    if (choice === 'Add Employee') {
+      addEmployee()
+    }
 
-  if (choices === 'Update Employee Role') {
-    updateEmployeeRole()
-  }
+    if (choice === 'Update Employee Role') {
+      updateEmployeeRole()
+    }
 
-  if (choices === 'View All Roles') {
-    viewAllRoles()
-  }
+    if (choice === 'View All Roles') {
+      viewAllRoles()
+    }
 
-  if (choices === 'Add Role') {
-    addRole()
-  }
+    if (choice === 'Add Role') {
+      addRole()
+    }
 
-  if (choices === 'View All Departments') {
-    viewAllDepartments()
-  }
+    if (choice === 'View All Departments') {
+      viewAllDepartments()
+    }
 
-  if (choices === 'Add Department') {
-    addDepartment()
-  }
+    if (choice === 'Add Department') {
+      addDepartment()
+    }
 
-  if (choices === 'Quit') {
-    closeApp()
-  }
+    if (choice === 'Quit') {
+      closeApp()
+    }
+  })
 }
 // Function call to initialize app
 init()
