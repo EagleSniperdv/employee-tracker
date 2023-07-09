@@ -341,7 +341,7 @@ const addDepartment = () => {
 }
 // Function for closing the app
 const closeApp = () => {
-  console.log('App closed')
+  db.end()
 }
 
 // Function to show the prompt
