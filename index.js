@@ -143,13 +143,13 @@ const addEmployee = () => {
 
 // Function for updating an employee role
 const updateEmployeeRole = () => {
-  const query = `SELECT employee.id, employee.first_name, employee.last_name, role.id
-                    FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`
+  let employees = []
+  const query = `SELECT employee.id, employee.first_name, employee.last_name, role.id AS "role_id"
+  FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`
   db.query(query, (err, response) => {
     if (err) {
       throw new Error(err)
     } else {
-      let employees = []
       response.forEach((employee) => {
         employees.push(`${employee.first_name} ${employee.last_name}`)
       })
@@ -186,15 +186,7 @@ const updateEmployeeRole = () => {
               response.forEach((role) => {
                 if (answer.rolesList === role.title) {
                   titleId = role.id
-                }
-              })
-
-              response.forEach((employee) => {
-                if (
-                  answer.employeesList ===
-                  `${employee.first_name} ${employee.last_name}`
-                ) {
-                  employeeId = employee.id
+                  employeeId = role.id
                 }
               })
 
@@ -207,7 +199,7 @@ const updateEmployeeRole = () => {
                     '\x1b[32m Employees role has been updated! \x1b[0m'
                   )
                   setTimeout(() => {
-                    showPrompt()
+                    viewAllEmployees()
                   }, 1000)
                 }
               })
@@ -236,15 +228,116 @@ const viewAllRoles = () => {
 }
 // Function for adding a role
 const addRole = () => {
-  console.log('Added a role')
+  const query = `SELECT * FROM department`
+  db.query(query, (err, response) => {
+    if (err) {
+      throw new Error(err)
+    } else {
+      let departmentNames = []
+      response.forEach((department) => {
+        departmentNames.push(department.department_name)
+      })
+      departmentNames.push('Create Department')
+      inquirer
+        .prompt([
+          {
+            name: 'newDepartmentName',
+            type: 'list',
+            message: 'Which department is the new role in?',
+            choices: departmentNames,
+          },
+        ])
+        .then((answer) => {
+          if (answer.newDepartmentName === 'Create Department') {
+            addDepartment()
+          } else {
+            addNewRole(answer)
+          }
+        })
+
+      const addNewRole = (data) => {
+        inquirer
+          .prompt([
+            {
+              name: 'newRole',
+              type: 'input',
+              message: 'What is the name of your new role?',
+            },
+            {
+              name: 'salary',
+              type: 'input',
+              message: 'What is the salary of this new role?',
+            },
+          ])
+          .then((answer) => {
+            const createdRole = answer.newRole
+            const salary = answer.salary
+            let departmentId
+
+            response.forEach((department) => {
+              if (data.newDepartmentName === department.department_name) {
+                departmentId = department.id
+              }
+            })
+
+            const query = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`
+            let params = [createdRole, salary, departmentId]
+
+            db.query(query, params, (err) => {
+              if (err) {
+                throw new Error(err)
+              } else {
+                console.log(`\x1b[32m ${createdRole} role created! \x1b[0m`)
+              }
+              setTimeout(() => {
+                viewAllRoles()
+              }, 1000)
+            })
+          })
+      }
+    }
+  })
 }
 // Function for viewing all departments
 const viewAllDepartments = () => {
-  console.log('Viewing all departments')
+  const query = `SELECT department.id, department.department_name FROM department`
+  db.query(query, (err, response) => {
+    if (err) {
+      throw new Error(err)
+    } else {
+      console.log('Viewing All Departments:')
+      console.table(response)
+      setTimeout(() => {
+        showPrompt()
+      }, 1000)
+    }
+  })
 }
 // Function for adding a department
 const addDepartment = () => {
-  console.log('Added a department')
+  inquirer
+    .prompt([
+      {
+        name: 'newDepartment',
+        type: 'input',
+        message: 'What is the name of the new department?',
+      },
+    ])
+    .then((answer) => {
+      const query = `INSERT INTO department (department_name) VALUES (?)`
+      db.query(query, answer.newDepartment, (err, response) => {
+        if (err) {
+          throw new Error(err)
+        } else {
+          console.log(
+            `\x1b[32m ${answer.newDepartment} department created! \x1b[0m`
+          )
+          setTimeout(() => {
+            viewAllDepartments()
+          }, 1000)
+        }
+      })
+    })
 }
 // Function for closing the app
 const closeApp = () => {
