@@ -21,7 +21,7 @@ const choiceList = [
 ]
 // Function for viewing all employees
 const viewAllEmployees = () => {
-  let sql = `SELECT employee.id, 
+  const query = `SELECT employee.id, 
     employee.first_name, 
     employee.last_name, 
     role.title, 
@@ -31,7 +31,7 @@ const viewAllEmployees = () => {
     WHERE department.id = role.department_id 
     AND role.id = employee.role_id
     ORDER BY employee.id ASC`
-  db.query(sql, (err, response) => {
+  db.query(query, (err, response) => {
     if (err) {
       throw new Error(err)
     } else {
@@ -43,8 +43,104 @@ const viewAllEmployees = () => {
 }
 // Function for adding an employee
 const addEmployee = () => {
-  console.log('Added an employee')
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'firstName',
+        message: "What is the employee's first name?",
+        validate: (firstName) => {
+          if (firstName) {
+            return true
+          } else {
+            console.log('Please enter a first name')
+            return false
+          }
+        },
+      },
+      {
+        type: 'input',
+        name: 'lastName',
+        message: "What is the employee's last name?",
+        validate: (lastName) => {
+          if (lastName) {
+            return true
+          } else {
+            console.log('Please enter a last name')
+            return false
+          }
+        },
+      },
+    ])
+    .then((answer) => {
+      const fullName = [answer.firstName, answer.lastName]
+      const query = `SELECT role.id, role.title FROM role`
+      db.query(query, (err, response) => {
+        if (err) {
+          throw new Error(err)
+        } else {
+          const allRoles = response.map(({ id, title }) => ({
+            name: title,
+            value: id,
+          }))
+          inquirer
+            .prompt([
+              {
+                type: 'list',
+                name: 'allRoles',
+                message: "What is the employee's role?",
+                choices: allRoles,
+              },
+            ])
+            .then((answer) => {
+              const role = answer.allRoles
+              fullName.push(role)
+              const query = `SELECT * FROM employee`
+              db.query(query, (err, response) => {
+                if (err) {
+                  throw new Error(err)
+                } else {
+                  const allManagers = response.map(
+                    ({ id, first_name, last_name }) => ({
+                      name: first_name + ' ' + last_name,
+                      value: id,
+                    })
+                  )
+                  inquirer
+                    .prompt([
+                      {
+                        type: 'list',
+                        name: 'allManagers',
+                        message: "Who is the employee's manager?",
+                        choices: allManagers,
+                      },
+                    ])
+                    .then((answer) => {
+                      const manager = answer.manager
+                      fullName.push(manager)
+                      const query = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                    VALUES (?, ?, ?, ?)`
+                      db.query(query, fullName, (err) => {
+                        if (err) {
+                          throw new Error(err)
+                        } else {
+                          console.log(
+                            '\x1b[32m Employee has been added! \x1b[0m'
+                          )
+                          setTimeout(() => {
+                            viewAllEmployees()
+                          }, 1000)
+                        }
+                      })
+                    })
+                }
+              })
+            })
+        }
+      })
+    })
 }
+
 // Function for updating an employee role
 const updateEmployeeRole = () => {
   console.log('Updated employee role')
@@ -70,7 +166,7 @@ const closeApp = () => {
   console.log('App closed')
 }
 
-// Create a function to initialize app
+// Function to show the prompt
 const showPrompt = () => {
   // Method to connect to our db
   db.connect((err) => {
@@ -114,5 +210,5 @@ const showPrompt = () => {
     }
   })
 }
-// Function call to initialize app
+// Show the prompt when we start our app
 showPrompt()
