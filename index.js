@@ -1,4 +1,5 @@
 // Required packages
+const db = require('./db/connection')
 const inquirer = require('inquirer')
 
 const choiceList = [
@@ -53,38 +54,45 @@ const closeApp = () => {
 
 // Create a function to initialize app
 const init = () => {
-  inquirer.prompt(choiceList).then((answer) => {
-    const choice = answer.choiceList
-    if (choice === 'View All Employees') {
-      viewAllEmployees()
-    }
+  // Method to connect to our db
+  db.connect((err) => {
+    if (err) {
+      throw new Error(err)
+    } else {
+      inquirer.prompt(choiceList).then((answer) => {
+        const choice = answer.choiceList
+        if (choice === 'View All Employees') {
+          viewAllEmployees()
+        }
 
-    if (choice === 'Add Employee') {
-      addEmployee()
-    }
+        if (choice === 'Add Employee') {
+          addEmployee()
+        }
 
-    if (choice === 'Update Employee Role') {
-      updateEmployeeRole()
-    }
+        if (choice === 'Update Employee Role') {
+          updateEmployeeRole()
+        }
 
-    if (choice === 'View All Roles') {
-      viewAllRoles()
-    }
+        if (choice === 'View All Roles') {
+          viewAllRoles()
+        }
 
-    if (choice === 'Add Role') {
-      addRole()
-    }
+        if (choice === 'Add Role') {
+          addRole()
+        }
 
-    if (choice === 'View All Departments') {
-      viewAllDepartments()
-    }
+        if (choice === 'View All Departments') {
+          viewAllDepartments()
+        }
 
-    if (choice === 'Add Department') {
-      addDepartment()
-    }
+        if (choice === 'Add Department') {
+          addDepartment()
+        }
 
-    if (choice === 'Quit') {
-      closeApp()
+        if (choice === 'Quit') {
+          closeApp()
+        }
+      })
     }
   })
 }
