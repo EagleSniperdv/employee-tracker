@@ -28,23 +28,74 @@ const questions = [
     ],
   },
 ]
+// Function for viewing all employees
+const viewAllEmployees = () => {
+  console.log('Viewing all employees')
+}
+// Function for adding an employee
+const addEmployee = () => {
+  console.log('Added an employee')
+}
+// Function for updating an employee role
+const updateEmployeeRole = () => {
+  console.log('Updated employee role')
+}
+// Function for viewing all roles
+const viewAllRoles = () => {
+  console.log('Viewing all roles')
+}
+// Function for adding a role
+const addRole = () => {
+  console.log('Added a role')
+}
+// Function for viewing all departments
+const viewAllDepartments = () => {
+  console.log('Viewing all departments')
+}
+// Function for adding a department
+const addDepartment = () => {
+  console.log('Added a department')
+}
+// Function for closing the app
+const closeApp = () => {
+  console.log('App closed')
+}
 
 // Create a function to initialize app
-const init = () => {
-  inquirer
-    .prompt(questions)
-    .then((answers) => {
-      const { choices } = answers
-      console.log(choices)
-    })
+const init = async () => {
+  const { choices } = await inquirer.prompt(questions)
+  console.log(choices)
+  if (choices === 'View All Employees') {
+    viewAllEmployees()
+  }
 
-    .catch((error) => {
-      if (error.isTtyError) {
-        console.log("Prompt couldn't be rendered in the current environment")
-      } else {
-        console.log('Something went wrong')
-      }
-    })
+  if (choices === 'Add Employee') {
+    addEmployee()
+  }
+
+  if (choices === 'Update Employee Role') {
+    updateEmployeeRole()
+  }
+
+  if (choices === 'View All Roles') {
+    viewAllRoles()
+  }
+
+  if (choices === 'Add Role') {
+    addRole()
+  }
+
+  if (choices === 'View All Departments') {
+    viewAllDepartments()
+  }
+
+  if (choices === 'Add Department') {
+    addDepartment()
+  }
+
+  if (choices === 'Quit') {
+    closeApp()
+  }
 }
 // Function call to initialize app
 init()
