@@ -143,7 +143,79 @@ const addEmployee = () => {
 
 // Function for updating an employee role
 const updateEmployeeRole = () => {
-  console.log('Updated employee role')
+  const query = `SELECT employee.id, employee.first_name, employee.last_name, role.id AS "role_id"
+                    FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`
+  db.query(query, (err, response) => {
+    if (err) {
+      throw new Error(err)
+    } else {
+      let employees = []
+      response.forEach((employee) => {
+        employees.push(`${employee.first_name} ${employee.last_name}`)
+      })
+
+      const secondQuery = `SELECT role.id, role.title FROM role`
+      db.query(secondQuery, (err, response) => {
+        if (err) {
+          throw new Error(err)
+        } else {
+          let roles = []
+          response.forEach((role) => {
+            roles.push(role.title)
+          })
+
+          inquirer
+            .prompt([
+              {
+                name: 'employeesList',
+                type: 'list',
+                message: 'Which employee has a new role?',
+                choices: employees,
+              },
+              {
+                name: 'rolesList',
+                type: 'list',
+                message: 'What is their new role?',
+                choices: roles,
+              },
+            ])
+            .then((answer) => {
+              let titleId
+              let employeeId
+
+              response.forEach((role) => {
+                if (answer.rolesList === role.title) {
+                  titleId = role.id
+                }
+              })
+
+              response.forEach((employee) => {
+                if (
+                  answer.employeesList ===
+                  `${employee.first_name} ${employee.last_name}`
+                ) {
+                  employeeId = employee.id
+                }
+              })
+
+              const thirdQuery = `UPDATE employee SET employee.role_id = ? WHERE employee.id = ?`
+              db.query(thirdQuery, [titleId, employeeId], (err) => {
+                if (err) {
+                  throw new Error(err)
+                } else {
+                  console.log(
+                    '\x1b[32m Employees role has been updated! \x1b[0m'
+                  )
+                  setTimeout(() => {
+                    viewAllEmployees()
+                  }, 1000)
+                }
+              })
+            })
+        }
+      })
+    }
+  })
 }
 // Function for viewing all roles
 const viewAllRoles = () => {
