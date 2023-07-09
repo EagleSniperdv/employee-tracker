@@ -143,7 +143,7 @@ const addEmployee = () => {
 
 // Function for updating an employee role
 const updateEmployeeRole = () => {
-  const query = `SELECT employee.id, employee.first_name, employee.last_name, role.id AS "role_id"
+  const query = `SELECT employee.id, employee.first_name, employee.last_name, role.id
                     FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`
   db.query(query, (err, response) => {
     if (err) {
@@ -207,7 +207,7 @@ const updateEmployeeRole = () => {
                     '\x1b[32m Employees role has been updated! \x1b[0m'
                   )
                   setTimeout(() => {
-                    viewAllEmployees()
+                    showPrompt()
                   }, 1000)
                 }
               })
@@ -219,7 +219,20 @@ const updateEmployeeRole = () => {
 }
 // Function for viewing all roles
 const viewAllRoles = () => {
-  console.log('Viewing all roles')
+  console.log('Viewing All Employee Roles:')
+  const query = `SELECT role.id, role.title, department.department_name
+                  FROM role
+                  INNER JOIN department ON role.department_id = department.id`
+  db.query(query, (err, response) => {
+    if (err) {
+      throw new Error(err)
+    } else {
+      response.forEach((role) => {
+        console.log(`\x1b[32m ${role.title} \x1b[0m`)
+      })
+      showPrompt()
+    }
+  })
 }
 // Function for adding a role
 const addRole = () => {
