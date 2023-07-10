@@ -8,13 +8,13 @@ const choiceList = [
     name: 'choiceList',
     message: 'What would you like to do?',
     choices: [
+      'View All Departments',
+      'View All Roles',
       'View All Employees',
+      'Add Department',
+      'Add Role',
       'Add Employee',
       'Update Employee Role',
-      'View All Roles',
-      'Add Role',
-      'View All Departments',
-      'Add Department',
       'Quit',
     ],
   },
@@ -26,7 +26,8 @@ const viewAllEmployees = () => {
     employee.last_name, 
     role.title, 
     department.department_name, 
-    role.salary
+    role.salary,
+    employee.manager_id
     FROM employee, role, department 
     WHERE department.id = role.department_id 
     AND role.id = employee.role_id
@@ -220,16 +221,14 @@ const updateEmployeeRole = () => {
 // Function for viewing all roles
 const viewAllRoles = () => {
   console.log('Viewing All Employee Roles:')
-  const query = `SELECT role.id, role.title, department.department_name
+  const query = `SELECT role.id, role.title, role.salary, department.department_name
                   FROM role
                   INNER JOIN department ON role.department_id = department.id`
   db.query(query, (err, response) => {
     if (err) {
       throw new Error(err)
     } else {
-      response.forEach((role) => {
-        console.log(`\x1b[32m ${role.title} \x1b[0m`)
-      })
+      console.table(response)
       showPrompt()
     }
   })
