@@ -151,7 +151,10 @@ const updateEmployeeRole = () => {
       throw new Error(err)
     } else {
       response.forEach((employee) => {
-        employees.push(`${employee.first_name} ${employee.last_name}`)
+        employees.push({
+          id: `${employee.id}`,
+          fullName: `${employee.first_name} ${employee.last_name}`,
+        })
       })
 
       const secondQuery = `SELECT role.id, role.title FROM role`
@@ -170,7 +173,7 @@ const updateEmployeeRole = () => {
                 name: 'employeesList',
                 type: 'list',
                 message: 'Which employee has a new role?',
-                choices: employees,
+                choices: employees.map((names) => names.fullName),
               },
               {
                 name: 'rolesList',
@@ -180,18 +183,26 @@ const updateEmployeeRole = () => {
               },
             ])
             .then((answer) => {
-              let titleId
+              let roleId
               let employeeId
 
               response.forEach((role) => {
                 if (answer.rolesList === role.title) {
-                  titleId = role.id
-                  employeeId = role.id
+                  roleId = role.id
                 }
+
+                employees.map((name) => {
+                  if (answer.employeesList === name.fullName) {
+                    console.log(
+                      `Employee id for ${answer.employeesList} is ${name.id}`
+                    )
+                    employeeId = name.id
+                  }
+                })
               })
 
               const thirdQuery = `UPDATE employee SET employee.role_id = ? WHERE employee.id = ?`
-              db.query(thirdQuery, [titleId, employeeId], (err) => {
+              db.query(thirdQuery, [roleId, employeeId], (err) => {
                 if (err) {
                   throw new Error(err)
                 } else {
