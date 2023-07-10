@@ -193,9 +193,6 @@ const updateEmployeeRole = () => {
 
                 employees.map((name) => {
                   if (answer.employeesList === name.fullName) {
-                    console.log(
-                      `Employee id for ${answer.employeesList} is ${name.id}`
-                    )
                     employeeId = name.id
                   }
                 })
