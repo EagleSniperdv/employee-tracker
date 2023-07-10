@@ -3,12 +3,12 @@
 
 # Employee Tracker
 
-A node js console application for managing employees
+A node console application that uses mysql to manage employees
 
 ### Table of Contents
 
-**[User Story](#user%20story)**<br>
-**[Acceptance Criteria](#acceptance%20criteria)**<br>
+**[User Story](#user-story)**<br>
+**[Acceptance Criteria](#acceptance-criteria)**<br>
 **[Installation Instructions](#installation)**<br>
 **[Usage Instructions](#usage)**<br>
 **[License](#license)**<br>
