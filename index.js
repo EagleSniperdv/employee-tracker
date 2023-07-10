@@ -25,9 +25,9 @@ const viewAllEmployees = () => {
     employee.first_name, 
     employee.last_name, 
     role.title, 
-    department.department_name, 
+    department.department_name AS department, 
     role.salary,
-    employee.manager_id
+    employee.manager_id AS manager
     FROM employee, role, department 
     WHERE department.id = role.department_id 
     AND role.id = employee.role_id
@@ -37,6 +37,15 @@ const viewAllEmployees = () => {
       throw new Error(err)
     } else {
       console.log('Viewing all employees:')
+      for (i = 0; i < response.length; i++) {
+        if (response[i].manager === null) {
+          response[i].manager = true
+        } else {
+          response[i].manager = `${
+            response[response[i].manager - 1].first_name
+          } ${response[response[i].manager - 1].last_name}`
+        }
+      }
       console.table(response)
     }
     showPrompt()
